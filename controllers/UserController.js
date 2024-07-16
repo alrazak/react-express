@@ -4,6 +4,12 @@ const express = require('express');
 //import prisma client
 const prisma = require('../prisma/client');
 
+//import validationResult from express-validator
+const { validationResult } = require('express-validator')
+
+//import bcrypt
+const bcrypt = require('bcryptjs')
+
 //function findUsers
 const findUser = async (req, res) => {
     try {
@@ -13,7 +19,8 @@ const findUser = async (req, res) => {
                 id: true,
                 name: true,
                 email: true,
-            }, orderBy: {
+            }, 
+            orderBy: {
                 id: 'desc',
             },
         });
@@ -24,7 +31,7 @@ const findUser = async (req, res) => {
             message: 'Get all users succesfully',
             data: users,
         });
-    } catch(error) {
+    } catch (error) {
         res.status(500).send({
             succes: false,
             message: 'Internal server error',
@@ -32,4 +39,44 @@ const findUser = async (req, res) => {
     }
 };
 
-module.exports = { findUser };
+//function creatUser
+const createUser = async (req, res) => {
+    //periksa hasil validasi
+    const errors = validationResult(req);
+
+    if(!errors.isEmpty()) {
+        //jika ada error, kembalikan error ke pengguna
+        return res.status(422).json({
+            succes: false,
+            message: 'Validation error',
+            errors: errors.array(),
+        });
+    }
+
+    //hash password
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
+    try {
+        //insert data
+        const user = await prisma.user.create({
+            data: {
+                name: req.body.name,
+                email: req.body.email,
+                password: hashedPassword,
+            },
+        });
+
+        res.status(201).send({
+            succes: true,
+            message: 'User created succesfully',
+            data: user,
+        });
+    } catch (error) {
+        res.status(500).send({
+            succes: false,
+            message: 'Internal server error',
+        });
+    }
+};
+
+module.exports = { findUser, createUser };

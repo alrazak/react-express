@@ -14,10 +14,10 @@ const router = require('./routes')
 const app = express()
 
 //use cors
-app.use=(cors())
+app.use(cors())
 
 //use body parser
-app.use=(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({ extended: false }))
 
 //parse application/json
 app.use(bodyParser.json())

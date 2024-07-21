@@ -17,9 +17,9 @@ const prisma = require('../prisma/client');
 const login = async (req, res) => {
 
     //periksa hasil validasi
-    const error = validationResult(req);
+    const errors = validationResult(req);
 
-    if(!error.isEmpty()) {
+    if(!errors.isEmpty()) {
         //jika ada error, kembalikan error ke pengguna
         return res.status(422).json({
             succes: false,

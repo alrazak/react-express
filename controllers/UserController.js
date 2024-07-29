@@ -127,7 +127,7 @@ const updateUser = async (req, res) => {
         return res.status(422).json({
             succes: false,
             message: 'Validation error',
-            error: error.array(),
+            errors: errors.array(),
         });
     }
 
